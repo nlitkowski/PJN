@@ -108,3 +108,5 @@ dmypy.json
 .pyre/
 
 # End of https://www.gitignore.io/api/python
+e/*.json
+e/e01/*.json

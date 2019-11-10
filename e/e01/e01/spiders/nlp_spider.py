@@ -11,7 +11,7 @@ class NlpSpider(scrapy.Spider):
         text = "".join(response.xpath("//body//text()").extract())
         text = text.replace("\t", " ").replace("\n", " ")
         # text = re.sub(r"\s+", " ", text)
-        yield {f"Text at '{response._get_url()}'": text}
+        yield {"site": response._get_url(), "text": str(text, encoding="unicode")}
         hrefs = []
         for link in response.xpath("//a/@href").getall():
             hrefs.append(link)

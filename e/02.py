@@ -9,15 +9,18 @@ def main():
         for y in text_json:
             if x != y and (x["site"]).replace(".php", "_en.php") == y["site"]:
                 process(x, y)
-    run("touch tmp.dict")
-    run("hunalign -text -utf -realign tmp.dict pl.txt en.txt > aligned.txt")
+    run('echo "" > tmp.dict', shell=True)
+    run("hunalign -text -utf -realign tmp.dict pl.txt en.txt > aligned.txt", shell=True)
+    run("rm en.txt pl.txt tmp.dict translate.txt", shell=True)
 
 
 def process(pl, en):
     with open("pl.txt", mode="a", encoding="utf-8") as f:
-        f.writelines(sent_tokenize(pl["text"]))
+        for l in sent_tokenize(pl["text"]):
+            f.write(l)
     with open("en.txt", mode="a", encoding="utf-8") as f:
-        f.writelines(sent_tokenize(en["text"]))
+        for l in sent_tokenize(en["text"]):
+            f.write(l)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import json
 from nltk.tokenize import sent_tokenize
+from subprocess import run
 
 
 def main():
@@ -8,11 +9,15 @@ def main():
         for y in text_json:
             if x != y and (x["site"]).replace(".php", "_en.php") == y["site"]:
                 process(x, y)
+    run("touch tmp.dict")
+    run("hunalign -text -utf -realign tmp.dict pl.txt en.txt > aligned.txt")
 
 
-def process(s1, s2):
-    token_list1 = sent_tokenize(s1["text"])
-    token_list2 = sent_tokenize(s2["text"])
+def process(pl, en):
+    with open("pl.txt", mode="a", encoding="utf-8") as f:
+        f.writelines(sent_tokenize(pl["text"]))
+    with open("en.txt", mode="a", encoding="utf-8") as f:
+        f.writelines(sent_tokenize(en["text"]))
 
 
 if __name__ == "__main__":

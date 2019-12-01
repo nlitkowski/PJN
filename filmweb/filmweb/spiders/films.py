@@ -9,35 +9,38 @@ class FilmsSpider(scrapy.Spider):
     start_urls = [
         "https://www.filmweb.pl/films/search?orderBy=popularity&descending=true&page=1"
     ]
+    repeats = 0
+    max_repeats = 500
 
     def parse(self, response: scrapy.http.response.html.HtmlResponse):
-        for film_div in response.xpath("//a[@class='filmPreview__link']/@href"):
-            link = film_div.xpath("//a[@class='filmPreview__link']/@href").get()
-            grade = film_div.xpath("//span[@class='rateBox__rate']/text()").get()
+        for film_li in response.xpath("//li[@class='hits__item']"):
+            hxs = scrapy.selector.Selector(text=film_li.extract())
+            link = hxs.xpath("//a[@class='filmPreview__link']/@href").get()
+            grade = hxs.xpath("//span[@class='rateBox__rate']/text()").get()
             yield scrapy.Request(
-                self.base_domain + link,
-                callback=self.parse_film,
-                cb_kwargs={"grade": float(grade)},
+                self.base_domain + link + "/cast/actors",
+                callback=self.parse_cast,
+                cb_kwargs={"grade": float(grade.replace(",", ".")), "actors": None},
             )
-        yield response.follow(
-            "/films/search"
-            + response.xpath(
-                "//li[@class='pagination__item pagination__item--next']/a/@href"
-            ).get()
-        )
+        if self.repeats < self.max_repeats:
+            self.repeats += 1
+            yield response.follow(
+                "/films/search"
+                + response.xpath(
+                    "//li[@class='pagination__item pagination__item--next']/a/@href"
+                ).get()
+            )
 
-    def parse_film(self, response: scrapy.http.response.html.HtmlResponse):
-        grade = response.cb_kwargs["grade"]
-        crew = scrapy.Request(
-            response._get_url() + "/cast/crew", callback=self.parse_crew
-        )
-        actors = scrapy.Request(
-            response._get_url() + "/cast/actors", callback=self.parse_actors
-        )
-        yield {"grade": grade, "actors": actors, "crew": crew}
+    def parse_cast(
+        self, response: scrapy.http.response.html.HtmlResponse, grade, actors
+    ):
+        cast_list = response.xpath("//a[@rel='v:starring']/text()").getall()
+        if actors is None:
+            return scrapy.Request(
+                response._get_url().replace("actors", "crew"),
+                callback=self.parse_cast,
+                cb_kwargs={"grade": grade, "actors": cast_list},
+            )
+        else:
+            return {"grade": grade, "actors": actors, "crew": cast_list}
 
-    def parse_crew(self, response: scrapy.http.response.html.HtmlResponse):
-        pass
-
-    def parse_actors(self, response: scrapy.http.response.html.HtmlResponse):
-        pass

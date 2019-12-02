@@ -114,4 +114,4 @@ e/en.txt
 e/pl.txt
 e/tmp.dict
 e/translate.txt
-filmweb/filmweb/spiders/*.json
+filmweb/*.json

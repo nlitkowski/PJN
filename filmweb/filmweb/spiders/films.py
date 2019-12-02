@@ -10,20 +10,22 @@ class FilmsSpider(scrapy.Spider):
         "https://www.filmweb.pl/films/search?orderBy=popularity&descending=true&page=1"
     ]
     repeats = 0
-    max_repeats = 500
+    max_repeats = 999 #1001st page doesnt exist
 
     def parse(self, response: scrapy.http.response.html.HtmlResponse):
         for film_li in response.xpath("//li[@class='hits__item']"):
             hxs = scrapy.selector.Selector(text=film_li.extract())
             link = hxs.xpath("//a[@class='filmPreview__link']/@href").get()
             grade = hxs.xpath("//span[@class='rateBox__rate']/text()").get()
-            yield scrapy.Request(
-                self.base_domain + link + "/cast/actors",
-                callback=self.parse_cast,
-                cb_kwargs={"grade": float(grade.replace(",", ".")), "actors": None},
-            )
+            if grade is not None:
+                yield scrapy.Request(
+                    self.base_domain + link + "/cast/actors",
+                    callback=self.parse_cast,
+                    cb_kwargs={"grade": float(grade.replace(",", ".")), "actors": None},
+                )
         if self.repeats < self.max_repeats:
             self.repeats += 1
+            print(f"URL: <{response._get_url()}>")
             yield response.follow(
                 "/films/search"
                 + response.xpath(

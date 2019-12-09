@@ -18,12 +18,18 @@ def main():
             f.write(get_vw_line_train(o))
 
     with open("dev_data.txt", "w", encoding="utf-8") as f:
-        for o in dev_set:
-            f.write(get_vw_line_test(o))
+        with open("dev_data_actual.txt", "w") as f2:
+            for o in dev_set:
+                line_data, line_actual = get_vw_line_test(o)
+                f.write(line_data)
+                f2.write(line_actual)
 
     with open("test_data.txt", "w", encoding="utf-8") as f:
-        for o in dev_set:
-            f.write(get_vw_line_test(o))
+        with open("test_data_actual.txt", "w") as f2:
+            for o in test_set:
+                line_data, line_actual = get_vw_line_test(o)
+                f.write(line_data)
+                f2.write(line_actual)
 
 
 def get_vw_line_train(o):
@@ -40,7 +46,7 @@ def get_vw_line_train(o):
     return f"{o['grade']} {o['count']} | {crew_string} {actors_string}\n"
 
 def get_vw_line_test(o):
-        """o: json object representing Filmweb data"""
+    """o: json object representing Filmweb data"""
 
     crew_string = ""
     for l in o["crew"]:
@@ -50,7 +56,7 @@ def get_vw_line_test(o):
     for l in o["actors"]:
         actors_string += f"actor_{l.strip().replace(' ', '_')} "
 
-    return f"| {crew_string} {actors_string}\n"
+    return f"| {crew_string} {actors_string}\n", str(o['grade'])
 
 if __name__ == "__main__":
     main()

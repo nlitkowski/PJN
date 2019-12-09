@@ -15,18 +15,18 @@ def main():
 
     with open("learn_data.txt", "w", encoding="utf-8") as f:
         for o in learning_set:
-            f.write(get_vw_line(o))
+            f.write(get_vw_line_train(o))
 
     with open("dev_data.txt", "w", encoding="utf-8") as f:
         for o in dev_set:
-            f.write(get_vw_line(o))
+            f.write(get_vw_line_test(o))
 
     with open("test_data.txt", "w", encoding="utf-8") as f:
         for o in dev_set:
-            f.write(get_vw_line(o))
+            f.write(get_vw_line_test(o))
 
 
-def get_vw_line(o):
+def get_vw_line_train(o):
     """o: json object representing Filmweb data"""
 
     crew_string = ""
@@ -36,9 +36,21 @@ def get_vw_line(o):
     actors_string = ""
     for l in o["actors"]:
         actors_string += f"actor_{l.strip().replace(' ', '_')} "
+    # result importance | features
+    return f"{o['grade']} {o['count']} | {crew_string} {actors_string}\n"
 
-    return f"{o['grade']} | {crew_string} {actors_string}\n"
+def get_vw_line_test(o):
+        """o: json object representing Filmweb data"""
 
+    crew_string = ""
+    for l in o["crew"]:
+        crew_string += f"crew_{l.strip().replace(' ', '_')} "
+
+    actors_string = ""
+    for l in o["actors"]:
+        actors_string += f"actor_{l.strip().replace(' ', '_')} "
+
+    return f"| {crew_string} {actors_string}\n"
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,7 @@ class FilmsSpider(scrapy.Spider):
     allowed_domains = ["filmweb.pl"]
     base_domain = "https://www.filmweb.pl"
     start_urls = [
-        "https://www.filmweb.pl/films/search?orderBy=popularity&descending=true&page=1"
+        "https://www.filmweb.pl/films/search?endYear=2019&orderBy=popularity&descending=true&startYear=1960&page=1"
     ]
     repeats = 0
     max_repeats = 999  # 1001st page doesnt exist
@@ -17,6 +17,7 @@ class FilmsSpider(scrapy.Spider):
             hxs = scrapy.selector.Selector(text=film_li.extract())
             link = hxs.xpath("//a[@class='filmPreview__link']/@href").get()
             grade = hxs.xpath("//span[@class='rateBox__rate']/text()").get()
+            year = hxs.xpath("//span[@class='filmPreview__year']/text()").get()
             grade_count = hxs.xpath(
                 "//span[@class='rateBox__votes rateBox__votes--count']/text()"
             ).get()
@@ -27,6 +28,7 @@ class FilmsSpider(scrapy.Spider):
                     cb_kwargs={
                         "grade": float(grade.replace(",", ".")),
                         "count": int(grade_count.strip().replace(" ", "")),
+                        "year": year,
                         "actors": None,
                     },
                 )
@@ -41,15 +43,15 @@ class FilmsSpider(scrapy.Spider):
             )
 
     def parse_cast(
-        self, response: scrapy.http.response.html.HtmlResponse, grade, count, actors
+        self, response: scrapy.http.response.html.HtmlResponse, grade, count, year, actors
     ):
         cast_list = response.xpath("//a[@rel='v:starring']/text()").getall()
         if actors is None:
             return scrapy.Request(
                 response._get_url().replace("actors", "crew"),
                 callback=self.parse_cast,
-                cb_kwargs={"grade": grade, "count": count, "actors": cast_list},
+                cb_kwargs={"grade": grade, "count": count, "year": year, "actors": cast_list},
             )
         else:
-            return {"grade": grade, "count": count, "actors": actors, "crew": cast_list}
+            return {"grade": grade, "count": count, "year": year, "actors": actors, "crew": cast_list}
 

@@ -56,7 +56,7 @@ def get_vw_line_test(o):
     for l in o["actors"]:
         actors_string += f"actor_{l.strip().replace(' ', '_')} "
 
-    return f"| {crew_string} {actors_string}\n", str(o['grade'])
+    return f"| {crew_string} {actors_string}\n", f"{o['grade']}\n"
 
 if __name__ == "__main__":
     main()

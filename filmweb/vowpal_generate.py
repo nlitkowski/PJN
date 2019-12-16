@@ -39,14 +39,25 @@ def get_vw_line_train(o):
     for l in o["crew"]:
         crew_string += f"crew_{l.strip().replace(' ', '_')} "
 
-    title_string = o['title'].strip()
-    ori_title_string = o['original_title'].strip()
-    director = 'director_' + o['director'].replace(' ', '_')
+    title_string = o['title']
+    ori_title_string = o['original_title']
+    director = "" 
+    if o['director'] is not None:
+        director = 'director_' + o['director'].replace(' ', '_')
+    country = ""
+    if o['country'] is not None:
+        country = f"country_{o['country'].replace(' ','_')}"
+    year = ""
+    if o['year'] is not None:
+        year = f"year_{o['year']}"
+    genre = ""
+    if o['genre'] is not None:
+        genre = f"genre_{o['genre'].replace(' ', '_')}"
     actors_string = ""
     for l in o["actors"]:
         actors_string += f"actor_{l.strip().replace(' ', '_')} "
     # result importance | features
-    return f"{o['grade']} {o['count']} | {director} {ori_title_string} {title_string} year_{o['year']} genre_{o['genre'].replace(' ', '_')} country_{o['country'].replace(' ','_')} {crew_string} {actors_string}\n"
+    return f"{o['grade']} {o['count']} | {director} {ori_title_string} {title_string} {year} {genre} {country} {crew_string} {actors_string}\n"
 
 
 def get_vw_line_test(o):
@@ -60,11 +71,22 @@ def get_vw_line_test(o):
     for l in o["actors"]:
         actors_string += f"actor_{l.strip().replace(' ', '_')} "
 
-    title_string = o['title'].strip()
-    ori_title_string = o['original_title'].strip()
-    director = 'director_' + o['director'].replace(' ', '_')
+    title_string = o['title']
+    ori_title_string = o['original_title']
+    director = "" 
+    if o['director'] is not None:
+        director = 'director_' + o['director'].replace(' ', '_')
+    country = ""
+    if o['country'] is not None:
+        country = f"country_{o['country'].replace(' ','_')}"
+    year = ""
+    if o['year'] is not None:
+        year = f"year_{o['year']}"
+    genre = ""
+    if o['genre'] is not None:
+        genre = f"genre_{o['genre'].replace(' ', '_')}"
 
-    return f"| {director} {ori_title_string} {title_string} year_{o['year']} genre_{o['genre'].replace(' ', '_')} country_{o['country'].replace(' ','_')} {crew_string} {actors_string}\n", f"{o['grade']}\n"
+    return f"| {director} {ori_title_string} {title_string} {year} {genre} {country} {crew_string} {actors_string}\n", f"{o['grade']}\n"
 
 
 if __name__ == "__main__":

@@ -17,15 +17,15 @@ def main():
         for o in learning_set:
             f.write(get_vw_line_train(o))
 
-    with open("dev_data.txt", "w", encoding="utf-8") as f:
-        with open("dev_data_actual.txt", "w") as f2:
+    with open("test_data.txt", "w", encoding="utf-8") as f:
+        with open("test_data_actual.txt", "w") as f2:
             for o in dev_set:
                 line_data, line_actual = get_vw_line_test(o)
                 f.write(line_data)
                 f2.write(line_actual)
 
-    with open("test_data.txt", "w", encoding="utf-8") as f:
-        with open("test_data_actual.txt", "w") as f2:
+    with open("dev_data.txt", "w", encoding="utf-8") as f:
+        with open("dev_data_actual.txt", "w") as f2:
             for o in test_set:
                 line_data, line_actual = get_vw_line_test(o)
                 f.write(line_data)
@@ -61,7 +61,7 @@ def get_vw_line_train(o):
     for l in o["actors"]:
         actors_string += f"actor_{l.strip().replace(' ', '_')} "
     # result importance | features
-    return f"{o['grade']} {o['count']} | {director} {ori_title_string} {title_string} {year} {genre} {country} {crew_string} {actors_string}\n"
+    return f"{o['grade']} {o['count']} | {director} {title_string} {ori_title_string} {year} {genre} {country} {crew_string} {actors_string}\n"
 
 
 def get_vw_line_test(o):
@@ -94,7 +94,7 @@ def get_vw_line_test(o):
     if o['genre'] is not None:
         genre = f"genre_{o['genre'].replace(' ', '_')}"
 
-    return f"| {director} {ori_title_string} {title_string} {year} {genre} {country} {crew_string} {actors_string}\n", f"{o['grade']}\n"
+    return f"| {director} {title_string} {ori_title_string} {year} {genre} {country} {crew_string} {actors_string}\n", f"{o['grade']}\n"
 
 
 if __name__ == "__main__":

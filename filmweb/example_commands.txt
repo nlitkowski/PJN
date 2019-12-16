@@ -1,0 +1,5 @@
+vw -d train.txt -f model.vw
+
+vw -d test_data.txt -i model.vw -p predictions.txt
+
+learn -> dev -> test (nie ruszac az do konca)

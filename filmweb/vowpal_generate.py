@@ -40,7 +40,11 @@ def get_vw_line_train(o):
         crew_string += f"crew_{l.strip().replace(' ', '_')} "
 
     title_string = o['title']
+    if title_string is not None:
+        title_string = title_string.replace(':','').replace('-','')
     ori_title_string = o['original_title']
+    if ori_title_string is not None:
+        ori_title_string = ori_title_string.replace(':','').replace('-','')
     director = "" 
     if o['director'] is not None:
         director = 'director_' + o['director'].replace(' ', '_')
@@ -72,7 +76,11 @@ def get_vw_line_test(o):
         actors_string += f"actor_{l.strip().replace(' ', '_')} "
 
     title_string = o['title']
+    if title_string is not None:
+        title_string = title_string.replace(':','').replace('-','')
     ori_title_string = o['original_title']
+    if ori_title_string is not None:
+        ori_title_string = ori_title_string.replace(':','').replace('-','')
     director = "" 
     if o['director'] is not None:
         director = 'director_' + o['director'].replace(' ', '_')

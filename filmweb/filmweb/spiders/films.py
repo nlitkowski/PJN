@@ -18,6 +18,15 @@ class FilmsSpider(scrapy.Spider):
             link = hxs.xpath("//a[@class='filmPreview__link']/@href").get()
             grade = hxs.xpath("//span[@class='rateBox__rate']/text()").get()
             year = hxs.xpath("//span[@class='filmPreview__year']/text()").get()
+            original_title = hxs.xpath(
+                "//div[@class='filmPreview__originalTitle']/text()").get()
+            title = hxs.xpath("//h3[@class='filmPreview__title']/text()").get()
+            genre = hxs.xpath(
+                "//div[@class='filmPreview__info filmPreview__info--genres']/ul/li/a/text()").get()
+            director = hxs.xpath(
+                "//div[@class='filmPreview__info filmPreview__info--directors']/ul/li/a/text()").get()
+            country = hxs.xpath(
+                "//div[@class='filmPreview__info filmPreview__info--countries']/ul/li/a/text()").get()
             grade_count = hxs.xpath(
                 "//span[@class='rateBox__votes rateBox__votes--count']/text()"
             ).get()
@@ -29,6 +38,11 @@ class FilmsSpider(scrapy.Spider):
                         "grade": float(grade.replace(",", ".")),
                         "count": int(grade_count.strip().replace(" ", "")),
                         "year": year,
+                        "original_title": original_title,
+                        "title": title,
+                        "genre": genre,
+                        "director": director,
+                        "country": country,
                         "actors": None,
                     },
                 )
@@ -43,15 +57,22 @@ class FilmsSpider(scrapy.Spider):
             )
 
     def parse_cast(
-        self, response: scrapy.http.response.html.HtmlResponse, grade, count, year, actors
+        self, response: scrapy.http.response.html.HtmlResponse, grade, count, year, original_title, title, genre, director, country, actors
     ):
         cast_list = response.xpath("//a[@rel='v:starring']/text()").getall()
         if actors is None:
             return scrapy.Request(
                 response._get_url().replace("actors", "crew"),
                 callback=self.parse_cast,
-                cb_kwargs={"grade": grade, "count": count, "year": year, "actors": cast_list},
+                cb_kwargs={"grade": grade, "count": count, "year": year, "original_title": original_title,
+                           "title": title,
+                           "genre": genre,
+                           "director": director,
+                           "country": country, "actors": cast_list},
             )
         else:
-            return {"grade": grade, "count": count, "year": year, "actors": actors, "crew": cast_list}
-
+            return {"grade": grade, "count": count, "year": year, "original_title": original_title,
+                    "title": title,
+                    "genre": genre,
+                    "director": director,
+                    "country": country, "actors": actors, "crew": cast_list}

@@ -33,35 +33,9 @@ def main():
 
 
 def get_vw_line_train(o):
-    """o: json object representing Filmweb data"""
-
-    crew_string = ""
-    for l in o["crew"]:
-        crew_string += f"crew_{l.strip().replace(' ', '_')} "
-
-    title_string = o['title']
-    if title_string is not None:
-        title_string = title_string.replace(':','').replace('-','')
-    ori_title_string = o['original_title']
-    if ori_title_string is not None:
-        ori_title_string = ori_title_string.replace(':','').replace('-','')
-    director = "" 
-    if o['director'] is not None:
-        director = 'director_' + o['director'].replace(' ', '_')
-    country = ""
-    if o['country'] is not None:
-        country = f"country_{o['country'].replace(' ','_')}"
-    year = ""
-    if o['year'] is not None:
-        year = f"year_{o['year']}"
-    genre = ""
-    if o['genre'] is not None:
-        genre = f"genre_{o['genre'].replace(' ', '_')}"
-    actors_string = ""
-    for l in o["actors"]:
-        actors_string += f"actor_{l.strip().replace(' ', '_')} "
     # result importance | features
-    return f"{o['grade']} {o['count']} | {director} {title_string} {ori_title_string} {year} {genre} {country} {crew_string} {actors_string}\n"
+    line, _ = get_vw_line_test(o)
+    return f"{o['grade']} {o['count']} | {line}"
 
 
 def get_vw_line_test(o):
@@ -94,7 +68,7 @@ def get_vw_line_test(o):
     if o['genre'] is not None:
         genre = f"genre_{o['genre'].replace(' ', '_')}"
 
-    return f"| {director} {title_string} {ori_title_string} {year} {genre} {country} {crew_string} {actors_string}\n", f"{o['grade']}\n"
+    return f"| {director} {year} {genre} {country}\n", f"{o['grade']}\n"
 
 
 if __name__ == "__main__":

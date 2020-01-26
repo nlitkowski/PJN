@@ -1,46 +1,20 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from selenium import webdriver
-from scrapy.spiders.crawl import CrawlSpider
-import time
 
 
-class EskySpider(CrawlSpider):
-    name = "esky-hr"
+class EskySpider(scrapy.Spider):
+    name = "esky-brutal"
     allowed_domains = ["esky.hr", "esky.com"]
     base_url = "https://www.esky.hr"
-    start_urls = ["https://www.esky.hr/hoteli/ci/spu/hoteli-split"]
-
-    def __init__(self):
-        CrawlSpider.__init__(self)
-        self.browser = webdriver.Firefox()
-
-    def __del__(self):
-        self.browser.close()
+    start_urls = ["https://www.esky.hr"]
 
     def parse(self, response: scrapy.http.response.html.HtmlResponse):
-        self.browser.get(response.url)
-        time.sleep(3)  # let javascript execute
-        body_hxs = scrapy.selector.Selector(text=self.browser.page_source)
-
-        for hotel_div in body_hxs.xpath("//div[@class='hotel-offer-wrapper']"):
-            hxs = scrapy.selector.Selector(text=hotel_div.extract())
-            hotel_name = hxs.xpath("//li[@class='hotel-name']/a/span/text()").get()
-            hotel_link = hxs.xpath(
-                "//li[@class='hotel-name']/a[@class='name-link']/@href"
-            ).get()
+        for i in range(3000000, 9999999):
             yield scrapy.Request(
-                self.base_url + hotel_link,
+                f"{self.base_url}/hoteli/ho/{i}",
                 callback=self.parse_hotel,
-                cb_kwargs={"name": hotel_name, "text_eng": None, "text_hr": None},
+                cb_kwargs={"name": i, "text_eng": None, "text_hr": None},
             )
-
-        self.browser.execute_script(
-            """var link = document.querySelector('a.next');
-                if (link) {
-                    link.click();
-                }"""
-        )
 
     def parse_hotel(
         self, response: scrapy.http.response.html.HtmlResponse, name, text_eng, text_hr
@@ -49,6 +23,8 @@ class EskySpider(CrawlSpider):
             text_hr = "".join(
                 response.xpath("//dd[@class='hotel-description']//text()").extract()
             )
+            if text_hr == "":
+                return None
             new_link = response._get_url().replace("esky.hr/hoteli", "esky.com/hotels")
             return scrapy.Request(
                 new_link,

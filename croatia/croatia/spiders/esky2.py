@@ -6,44 +6,26 @@ class EskySpider(scrapy.Spider):
     name = "esky-brutal"
     allowed_domains = ["esky.hr", "esky.com"]
     base_url = "https://www.esky.hr"
-    iteration = 0
-    start_urls = ["https://www.esky.hr/" for i in range(100)]
+    start_urls = [f"https://www.esky.hr/hoteli/ho/{i}" for i in range(100000, 999999)]
 
     def parse(self, response: scrapy.http.response.html.HtmlResponse):
-        for i in range(
-            self.iteration * 10000 + 100000, (self.iteration + 1) * 10000 + 100000
-        ):
-            yield scrapy.Request(
-                f"{self.base_url}/hoteli/ho/{i}",
-                callback=self.parse_hotel,
-                cb_kwargs={"name": i, "text_eng": None, "text_hr": None},
-            )
-        self.iteration += 1
+        text_hr = "".join(
+            response.xpath("//dd[@class='hotel-description']//text()").extract()
+        )
+        if text_hr == "":
+            return None
+        new_link = response._get_url().replace("esky.hr/hoteli", "esky.com/hotels")
+        return scrapy.Request(
+            new_link, callback=self.parse_eng, cb_kwargs={"text_hr": text_hr}
+        )
 
-    def parse_hotel(
-        self, response: scrapy.http.response.html.HtmlResponse, name, text_eng, text_hr
-    ):
-        if text_hr is None:
-            text_hr = "".join(
-                response.xpath("//dd[@class='hotel-description']//text()").extract()
-            )
-            if text_hr == "":
-                return None
-            new_link = response._get_url().replace("esky.hr/hoteli", "esky.com/hotels")
-            return scrapy.Request(
-                new_link,
-                callback=self.parse_hotel,
-                cb_kwargs={"name": name, "text_eng": None, "text_hr": text_hr},
-            )
-        else:
-            text_eng = "".join(
-                response.xpath("//dd[@class='hotel-description']//text()").extract()
-            )
-            if text_hr != text_eng:
-                return {
-                    "name": name,
-                    "text_eng": text_eng.strip(),
-                    "text_hr": text_hr.strip(),
-                }
-            else:
-                return None
+    def parse_eng(self, response: scrapy.http.response.html.HtmlResponse, text_hr: str):
+        text_eng = "".join(
+            response.xpath("//dd[@class='hotel-description']//text()").extract()
+        )
+        if text_hr != text_eng:
+            with open("c_output_hr.txt", "a", encoding="utf-8") as f:
+                f.write(text_hr.replace("\t", "").replace("\n", ""))
+            with open("c_output_en.txt", "a", encoding="utf-8") as f:
+                f.write(text_eng.replace("\t", "").replace("\n", ""))
+

@@ -5,9 +5,9 @@ from scrapy.spiders.crawl import CrawlSpider
 import time
 
 
-class BookingSpider(CrawlSpider):
+class EskySpider(CrawlSpider):
     name = "esky-hr"
-    allowed_domains = ["esky.hr"]
+    allowed_domains = ["esky.hr", "esky.com"]
     base_url = "https://www.esky.hr"
     start_urls = ["https://www.esky.hr/hoteli/ci/spu/hoteli-split"]
 
@@ -48,18 +48,20 @@ class BookingSpider(CrawlSpider):
                 response.xpath("//dd[@class='hotel-description']//text()").extract()
             )
             new_link = response._get_url().replace("esky.hr/hoteli", "esky.com/hotels")
-            print(f"NEW LINK: {new_link} !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             return scrapy.Request(
                 new_link,
                 callback=self.parse_hotel,
                 cb_kwargs={"name": name, "text_eng": None, "text_hr": text_hr},
             )
-        elif text_eng is None:
+        else:
             text_eng = "".join(
                 response.xpath("//dd[@class='hotel-description']//text()").extract()
             )
-            print(f"TEXT ENG: {text_eng} !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             if text_hr != text_eng:
-                return {"name": name, "text_eng": text_eng, "text_hr": text_hr}
+                return {
+                    "name": name,
+                    "text_eng": text_eng.strip(),
+                    "text_hr": text_hr.strip(),
+                }
             else:
                 return None

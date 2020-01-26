@@ -9,7 +9,7 @@ class EskySpider(scrapy.Spider):
     start_urls = ["https://www.esky.hr"]
 
     def parse(self, response: scrapy.http.response.html.HtmlResponse):
-        for i in range(3000000, 9999999):
+        for i in range(4835344, 9999999):
             yield scrapy.Request(
                 f"{self.base_url}/hoteli/ho/{i}",
                 callback=self.parse_hotel,

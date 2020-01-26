@@ -6,15 +6,29 @@ class EskySpider(scrapy.Spider):
     name = "esky-brutal"
     allowed_domains = ["esky.hr", "esky.com"]
     base_url = "https://www.esky.hr"
-    start_urls = ["https://www.esky.hr"]
+    iteration = 1
+    start_urls = [
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+        "https://www.esky.hr/",
+    ]
 
     def parse(self, response: scrapy.http.response.html.HtmlResponse):
-        for i in range(4835344, 9999999):
+        for i in range(self.iteration * 100000, (self.iteration + 1) * 100000):
             yield scrapy.Request(
                 f"{self.base_url}/hoteli/ho/{i}",
                 callback=self.parse_hotel,
                 cb_kwargs={"name": i, "text_eng": None, "text_hr": None},
             )
+        self.iteration += 1
 
     def parse_hotel(
         self, response: scrapy.http.response.html.HtmlResponse, name, text_eng, text_hr

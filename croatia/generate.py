@@ -2,15 +2,20 @@ import json
 from nltk.tokenize import sent_tokenize
 from subprocess import run
 
+PROCESS_FILES = False
+DELETE_FILES = False
+
 
 def main():
-    text_json = json.load(open("out4.json"))
-    for x in text_json:
-        process(x)
+    text_json = json.load(open("croatia/out4.json"))
+    if PROCESS_FILES:
+        for x in text_json:
+            process(x)
     # scripts working on Windows cmd
     run('echo "" > tmp.dict', shell=True)
     run("hunalign -text -utf -realign tmp.dict hr.txt en.txt > aligned.txt", shell=True)
-    run("del hr.txt en.txt tmp.dict translate.txt", shell=True)
+    if DELETE_FILES:
+        run("del hr.txt en.txt tmp.dict translate.txt", shell=True)
 
 
 def process(x):

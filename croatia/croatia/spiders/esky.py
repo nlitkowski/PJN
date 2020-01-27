@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from selenium import webdriver
+# from selenium import webdriver
 from scrapy.spiders.crawl import CrawlSpider
 import time
 
